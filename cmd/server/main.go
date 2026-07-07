@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
-	http1 "net/http"
+	"net/http"
 	"os"
 
 	"github.com/checkmarx/correlation-demo/internal/config"
@@ -50,7 +50,15 @@ func main() {
 	fmt.Println("  GET  /api/repo/list - List all repos")
 	fmt.Println("")
 
-	log.Fatal(http1.ListenAndServe(cfg.ServerPort, nil))
+	// Validate TLS configuration is provided before starting the server.
+	// TLS is required to prevent plaintext transmission of data in transit (CWE-319).
+	if cfg.TLSCertFile == "" || cfg.TLSKeyFile == "" {
+		log.Fatal("TLS_CERT_FILE and TLS_KEY_FILE environment variables must be set to enable HTTPS")
+	}
+
+	// Use ListenAndServeTLS to enforce encrypted transport (HTTPS).
+	// Plain HTTP (ListenAndServe) must not be used as it transmits data unencrypted.
+	log.Fatal(http.ListenAndServeTLS(cfg.ServerPort, cfg.TLSCertFile, cfg.TLSKeyFile, nil))
 }
 
 func initDirs(cfg *config.Config) {
