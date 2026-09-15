@@ -36,9 +36,9 @@ func main() {
 	h := handler.NewHandler(repoStore, validator, gitService)
 
 	// Register routes
-	http.HandleFunc("/api/repo/create", h.CreateRepo)
-	http.HandleFunc("/api/repo/clone", h.CloneRepo)
-	http.HandleFunc("/api/repo/list", h.ListRepos)
+	http1.HandleFunc("/api/repo/create", h.CreateRepo)
+	http1.HandleFunc("/api/repo/clone", h.CloneRepo)
+	http1.HandleFunc("/api/repo/list", h.ListRepos)
 
 	// Start server
 	fmt.Printf("Server starting on %s\n", cfg.ServerPort)
@@ -50,8 +50,11 @@ func main() {
 	fmt.Println("  GET  /api/repo/list - List all repos")
 	fmt.Println("")
 
-	log.Fatal(http1.ListenAndServe(cfg.ServerPort, nil))
-	log.Fatal(http1.ListenAndServe(cfg.ServerPort, nil))
+	// Use TLS (HTTPS) to protect data in transit and prevent Man-in-the-Middle attacks.
+	// TLS_CERT_FILE and TLS_KEY_FILE must be set to the paths of a valid certificate
+	// and private key respectively (e.g. obtained via Let's Encrypt or a self-signed
+	// certificate for development).
+	log.Fatal(http1.ListenAndServeTLS(cfg.ServerPort, cfg.TLSCertFile, cfg.TLSKeyFile, nil))
 }
 
 func initDirs(cfg *config.Config) {
