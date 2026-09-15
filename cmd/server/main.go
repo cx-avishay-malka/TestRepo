@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
-	http1 "net/http"
+	"net/http"
 	"os"
 
 	"github.com/checkmarx/correlation-demo/internal/config"
@@ -50,9 +50,10 @@ func main() {
 	fmt.Println("  GET  /api/repo/list - List all repos")
 	fmt.Println("")
 
-	log.Fatal(http1.ListenAndServe(cfg.ServerPort, nil))
-
-	log.Fatal(http1.ListenAndServe(cfg.ServerPort, nil))
+	// Use TLS (HTTPS) to protect data in transit (CWE-319).
+	// TLS_CERT_FILE and TLS_KEY_FILE must be set in the environment to paths
+	// of a valid X.509 certificate and its corresponding private key.
+	log.Fatal(http.ListenAndServeTLS(cfg.ServerPort, cfg.TLSCertFile, cfg.TLSKeyFile, nil))
 }
 
 func initDirs(cfg *config.Config) {
