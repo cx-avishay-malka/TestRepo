@@ -35,6 +35,8 @@ func main() {
 	// Initialize handler
 	h := handler.NewHandler(repoStore, validator, gitService)
 
+	log.Fatal(http.ListenAndServe(cfg.ServerPort, nil))
+
 	// Register routes
 	http.HandleFunc("/api/repo/create", h.CreateRepo)
 	http.HandleFunc("/api/repo/clone", h.CloneRepo)
@@ -50,11 +52,8 @@ func main() {
 	fmt.Println("  GET  /api/repo/list - List all repos")
 	fmt.Println("")
 
-
-
-    fmt.Println("made changes here")
-
 	log.Fatal(http.ListenAndServe(cfg.ServerPort, nil))
+	// ToDo finish task
 }
 
 func initDirs(cfg *config.Config) {
